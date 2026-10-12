@@ -2028,7 +2028,7 @@ const executeCcsImport = (row: ApiKey, clientType: CcSwitchClientType) => {
   const platform = row.group?.platform || 'anthropic'
 
   const usageScript = CC_SWITCH_USAGE_SCRIPT
-  const providerName = (publicSettings.value?.site_name || 'sub2api').trim() || 'sub2api'
+  const providerName = (publicSettings.value?.site_name || 'ai-gateway').trim() || 'ai-gateway'
   const deeplink = buildCcSwitchImportDeeplink({
     baseUrl,
     platform,

@@ -3,7 +3,7 @@ import { updateFavicon } from '@/utils/branding'
 
 describe('updateFavicon', () => {
   beforeEach(() => {
-    document.head.innerHTML = '<link rel="icon" href="/logo.svg">'
+    document.head.innerHTML = '<link rel="icon" href="/logo.jpg">'
   })
 
   it('replaces the default favicon with the configured logo', () => {
@@ -17,6 +17,16 @@ describe('updateFavicon', () => {
     updateFavicon('javascript:alert(1)')
 
     const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
-    expect(link?.getAttribute('href')).toBe('/logo.svg')
+    expect(link?.getAttribute('href')).toBe('/logo.jpg')
+  })
+
+  it('supports the JPEG logo after an SVG favicon was configured', () => {
+    document.head.innerHTML = '<link rel="icon" type="image/svg+xml" href="/old.svg">'
+
+    updateFavicon('/logo.jpg')
+
+    const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
+    expect(link?.getAttribute('href')).toBe('/logo.jpg')
+    expect(link?.hasAttribute('type')).toBe(false)
   })
 })

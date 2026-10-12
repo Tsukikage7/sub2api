@@ -93,7 +93,7 @@ const (
 	totpLoginTTL    = 5 * time.Minute
 	totpAttemptsTTL = 15 * time.Minute
 	maxTotpAttempts = 5
-	totpIssuer      = "Sub2API"
+	totpIssuer      = "ai-gateway"
 )
 
 // TotpService handles TOTP operations

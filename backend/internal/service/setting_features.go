@@ -291,9 +291,9 @@ func parseAuditLogRetentionDays(value string) int {
 func (s *SettingService) GetSiteName(ctx context.Context) string {
 	value, err := s.settingRepo.GetValue(ctx, SettingKeySiteName)
 	if err != nil || value == "" {
-		return "Sub2API"
+		return "ai-gateway"
 	}
-	return value
+	return normalizeSiteName(value)
 }
 
 // GetDefaultConcurrency 获取默认并发量

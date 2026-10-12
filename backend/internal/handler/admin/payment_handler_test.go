@@ -62,7 +62,7 @@ func TestAdminSubscriptionPlansForResponseIncludesCompositeGroupInfo(t *testing.
 			ValidityDays: 30,
 			ValidityUnit: "days",
 			Features:     "OpenAI\nClaude\nGemini\nGrok",
-			ProductName:  "Sub2API",
+			ProductName:  "ai-gateway",
 			ForSale:      true,
 			SortOrder:    1,
 			CreatedAt:    now,

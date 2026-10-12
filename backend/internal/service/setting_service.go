@@ -439,6 +439,12 @@ func (s *SettingService) SetVersion(version string) {
 // getStringOrDefault 获取字符串值或默认值
 func (s *SettingService) getStringOrDefault(settings map[string]string, key, defaultValue string) string {
 	if value, ok := settings[key]; ok && value != "" {
+		if key == SettingKeySiteName {
+			return normalizeSiteName(value)
+		}
+		if key == SettingKeySiteLogo && value == "/logo.svg" {
+			return defaultValue
+		}
 		return value
 	}
 	return defaultValue

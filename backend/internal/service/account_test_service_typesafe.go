@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	typeSafeTestDefaultState    = "Sub2API connection test"
+	typeSafeTestDefaultState    = "ai-gateway connection test"
 	typeSafeTestQuestionID      = "connection_test"
 	typeSafeTestMaxPreviewBytes = 2000
 )

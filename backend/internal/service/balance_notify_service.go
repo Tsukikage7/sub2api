@@ -21,8 +21,6 @@ const (
 	quotaDimDaily  = "daily"
 	quotaDimWeekly = "weekly"
 	quotaDimTotal  = "total"
-
-	defaultSiteName = "Sub2API"
 )
 
 // quotaDimLabels maps dimension names to display labels.
@@ -297,7 +295,7 @@ func (s *BalanceNotifyService) getSiteName(ctx context.Context) string {
 	if err != nil || name == "" {
 		return defaultSiteName
 	}
-	return name
+	return normalizeSiteName(name)
 }
 
 // filterVerifiedEmails returns deduplicated, non-disabled, verified emails.

@@ -74,7 +74,7 @@ func newPasskeyPwService(t *testing.T, user *User) (*PasskeyService, *passkeyPwR
 	repo := &passkeyPwRepoStub{}
 	svc, err := NewPasskeyService(&config.Config{WebAuthn: config.WebAuthnConfig{
 		Enabled:       true,
-		RPDisplayName: "Sub2API",
+		RPDisplayName: "ai-gateway",
 		RPID:          "sub2api.example.com",
 		RPOrigins:     []string{"https://sub2api.example.com"},
 	}}, repo, &passkeyPwSessionStoreStub{}, &passkeyPwUserRepoStub{user: user})
