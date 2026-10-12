@@ -1,0 +1,17 @@
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  build:
+    desc: 按上游版本号构建嵌入前端的 Linux AMD64 发布程序
+    cmds:
+      - bash "./deploy/build-native.sh"
+
+  deploy:
+    desc: 构建并发布到 ai-gateway 原生 systemd 服务（不执行业务验收）
+    cmds:
+      - task: build
+      - bash "./deploy/deploy-native.sh"
