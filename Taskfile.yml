@@ -6,7 +6,7 @@ tasks:
       - task --list
 
   build:
-    desc: 按上游版本号构建嵌入前端的 Linux AMD64 发布程序
+    desc: 按项目版本号构建嵌入前端的 Linux AMD64 发布程序
     cmds:
       - bash "./deploy/build-native.sh"
 
@@ -15,3 +15,8 @@ tasks:
     cmds:
       - task: build
       - bash "./deploy/deploy-native.sh"
+
+  upstream:sync:
+    desc: 获取并合并 Fork 上游 upstream/main，保留定制提交，冲突时停止
+    cmds:
+      - bash "./deploy/upstream-sync.sh"
