@@ -19,6 +19,7 @@ import (
 
 // Forward forwards request to OpenAI API
 func (s *OpenAIGatewayService) Forward(ctx context.Context, c *gin.Context, account *Account, body []byte) (*OpenAIForwardResult, error) {
+	structuredOutputGuard := requiresOpenAIStructuredOutputGuard(body)
 	beginUpstreamResponseModelObservation(c)
 	ClearActualOpenAIUpstreamEndpoint(c)
 	if shouldForwardOpenAIResponsesViaRawChatCompletions(account) {
@@ -1032,6 +1033,7 @@ func (s *OpenAIGatewayService) Forward(ctx context.Context, c *gin.Context, acco
 	httpInvalidEncryptedContentRetryTried := false
 	compactModelFallbackRetried := false
 	agentTaskRecoveryTried := false
+	structuredOutputRetryTried := false
 	rejectedFieldRetryState := openAIResponsesRejectedFieldRetryStateForRequest(c, body)
 	for {
 		// Build upstream request
@@ -1201,6 +1203,35 @@ func (s *OpenAIGatewayService) Forward(ctx context.Context, c *gin.Context, acco
 			return s.handleErrorResponse(ctx, resp, c, account, body, resolveOpenAIErrorSchedulingModel(billingModel, upstreamModel))
 		}
 		defer func() { _ = resp.Body.Close() }()
+
+		// 严格 JSON 的业务调用在完整校验前不向客户端提交语义输出，
+		// 这样上游偶发的非法 JSON 可以有限重试，而不会污染客户端 SSE。
+		if structuredOutputGuard {
+			firstOutputDeadline := time.Time{}
+			if firstOutputTimeout > 0 {
+				firstOutputDeadline = startTime.Add(firstOutputTimeout)
+			}
+			idleTimeout := time.Duration(0)
+			if s.cfg != nil && s.cfg.Gateway.StreamDataIntervalTimeout > 0 {
+				idleTimeout = time.Duration(s.cfg.Gateway.StreamDataIntervalTimeout) * time.Second
+			}
+			if guardErr := guardOpenAIStructuredOutputWithTimeouts(ctx, resp, firstOutputDeadline, idleTimeout); guardErr != nil {
+				_ = resp.Body.Close()
+				if ctx.Err() != nil {
+					return nil, ctx.Err()
+				}
+				appendOpsUpstreamError(c, OpsUpstreamErrorEvent{
+					Platform: account.Platform, AccountID: account.ID, AccountName: account.Name,
+					UpstreamStatusCode: http.StatusBadGateway, UpstreamRequestID: resp.Header.Get("x-request-id"),
+					Kind: "structured_output_invalid", Message: guardErr.Error(),
+				})
+				if !structuredOutputRetryTried {
+					structuredOutputRetryTried = true
+					continue
+				}
+				return nil, s.newOpenAIStreamFailoverError(c, account, false, resp.Header.Get("x-request-id"), nil, guardErr.Error(), resp.Header)
+			}
+		}
 
 		if mapping, ok := openAIResponsesClientToolMapping(c); ok && isEventStreamResponse(resp.Header) {
 			maxLineSize := defaultMaxLineSize

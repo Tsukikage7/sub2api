@@ -161,7 +161,7 @@ var openAIChatGPTInternalUnsupportedFields = []string{
 }
 
 var openAICodexOAuthUnsupportedFields = append([]string{
-	"max_output_tokens",
+	// Codex Responses now accepts max_output_tokens. Preserve the native cap.
 	"max_completion_tokens",
 	"temperature",
 	"top_p",
